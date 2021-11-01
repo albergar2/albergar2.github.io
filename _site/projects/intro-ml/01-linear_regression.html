@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Supervised Machine Learning: Linear Regression | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Supervised Machine Learning: Linear Regression" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-ml/01-linear_regression.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-ml/01-linear_regression.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Supervised Machine Learning: Linear Regression" />
+<script type="application/ld+json">
+{"headline":"Supervised Machine Learning: Linear Regression","url":"http://localhost:4000/projects/intro-ml/01-linear_regression.html","description":"Data Scientist","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=a236d4fa871ad402184e08df1cf5f421c06a0b3a">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">Alberto García Hernández</a></h1>
+        <h3>Data Scientist</h3>
+        <!-- <p> Machine Learning | NLP | Statistics | Software Engineering | Economics</p> -->
+        <p class=bio>
+          Data Scientist with 3 years of experience in ML and NLP, building and deploying 
+          end-to-end (CI/CD) data products in the financial and telecom industries.
+          Proficient in Python, NLP, SQL, TensorFlow, Spark and statistics.
+        </p>
+
+        <div>
+          <img src="/assets/img/bprofile.png" alt="Profile" />
+        </div>
+        
+
+        <ul class="menu-buttons">
+          <li><a href="https://www.linkedin.com/in/albergar2/">LinkedIn</a></li>
+          <li><a href="http://www.github.com/albergar2">GitHub</a></li>
+          <li><a href="http://www.github.com/albergar2">Projects</a></li>
+        </ul>
+
+        
+        
+      </header>
+      <section class=center>
+
+      <h1 id="supervised-machine-learning-linear-regression">Supervised Machine Learning: Linear Regression</h1>
+
+<p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/supervised/01-linear_regression.ipynb">Download Notebook</a></h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="n">sm</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Lasso</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">Ridge</span>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVR</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">statsmodels.sandbox.regression.predstd</span> <span class="kn">import</span> <span class="n">wls_prediction_std</span>
+<span class="kn">from</span> <span class="nn">statsmodels.iolib.table</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SimpleTable</span><span class="p">,</span> <span class="n">default_txt_fmt</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.outliers_influence</span> <span class="kn">import</span> <span class="n">variance_inflation_factor</span>
+
+</code></pre></div></div>
+
+<h2 id="1-load-data">1. Load Data</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">duncan_prestige</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">datasets</span><span class="p">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s">"Duncan"</span><span class="p">,</span> <span class="s">"carData"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">duncan_prestige</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>type</th>
+      <th>income</th>
+      <th>education</th>
+      <th>prestige</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>accountant</th>
+      <td>prof</td>
+      <td>62</td>
+      <td>86</td>
+      <td>82</td>
+    </tr>
+    <tr>
+      <th>pilot</th>
+      <td>prof</td>
+      <td>72</td>
+      <td>76</td>
+      <td>83</td>
+    </tr>
+    <tr>
+      <th>architect</th>
+      <td>prof</td>
+      <td>75</td>
+      <td>92</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th>author</th>
+      <td>prof</td>
+      <td>55</td>
+      <td>90</td>
+      <td>76</td>
+    </tr>
+    <tr>
+      <th>chemist</th>
+      <td>prof</td>
+      <td>64</td>
+      <td>86</td>
+      <td>90</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_train</span> <span class="o">=</span> <span class="n">duncan_prestige</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s">'income'</span><span class="p">].</span><span class="n">values</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">duncan_prestige</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s">'education'</span><span class="p">].</span><span class="n">values</span>
+</code></pre></div></div>
+
+<h2 id="2-ols">2. OLS</h2>
+
+<ul>
+  <li>OLS help us in identifying the more significant features that can has an influence on the output.</li>
+  <li>The higher the t-value for the feature, the more significant the feature is to the output variable.</li>
+  <li>If the p-value is less than 0.05(95% confidence interval) for a feature, then we can consider the feature to be significant.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.525
+Model:                            OLS   Adj. R-squared:                  0.514
+Method:                 Least Squares   F-statistic:                     47.51
+Date:                Sun, 28 Jun 2020   Prob (F-statistic):           1.84e-08
+Time:                        19:16:08   Log-Likelihood:                -190.42
+No. Observations:                  45   AIC:                             384.8
+Df Residuals:                      43   BIC:                             388.5
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const         10.6035      5.198      2.040      0.048       0.120      21.087
+x1             0.5949      0.086      6.893      0.000       0.421       0.769
+==============================================================================
+Omnibus:                        9.841   Durbin-Watson:                   1.736
+Prob(Omnibus):                  0.007   Jarque-Bera (JB):               10.609
+Skew:                           0.776   Prob(JB):                      0.00497
+Kurtosis:                       4.802   Cond. No.                         123.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</code></pre></div></div>
+
+<h2 id="3-heteroscedasticity">3. Heteroscedasticity</h2>
+
+<p>Heteroscedasticity means unequal scattered distribution. Heteroscedasticity is the systematic change in the spread of the residuals or errors over the range of measured values. Heteroscedasticity is the problem because Ordinary least squares (OLS) regression assumes that all residuals are drawn from a random population that has a constant variance.</p>
+
+<ul>
+  <li>
+    <p><strong>Pure heteroscedasticity</strong>: It refers to cases where we specify the correct model and let us observe the non-constant variance in residual plots.</p>
+  </li>
+  <li>
+    <p><strong>Impure heteroscedasticity</strong>: It refers to cases where you incorrectly specify the model, and that causes the non-constant variance. When you leave an important variable out of a model, the omitted effect is absorbed into the error term. If the effect of the omitted variable varies throughout the observed range of data, it can produce the telltale signs of heteroscedasticity in the residual plots.</p>
+  </li>
+</ul>
+
+<p>We can fix heteroscedasticity with the following actions:</p>
+
+<ul>
+  <li>
+    <p><strong>Redefining the variables</strong>: If your model is a cross-sectional model that includes large differences between the sizes of the observations, you can find different ways to specify the model that reduces the impact of the size differential. Change the model from using the raw measure to using rates and per capita values.</p>
+  </li>
+  <li>
+    <p><strong>Weighted regression</strong>: A method that assigns each data point a weight based on the variance of its fitted value. The idea is to give small weights to observations associated with higher variances to shrink their squared residuals. Weighted regression minimizes the sum of the weighted squared residuals. When you use the correct weights, heteroscedasticity is replaced by homoscedasticity.</p>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">statsmodels.stats.diagnostic</span> <span class="kn">import</span> <span class="n">het_breuschpagan</span>
+<span class="kn">from</span> <span class="nn">statsmodels.stats.diagnostic</span> <span class="kn">import</span> <span class="n">het_white</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp_test</span> <span class="o">=</span> <span class="n">het_breuschpagan</span><span class="p">(</span><span class="n">y_train</span><span class="o">-</span><span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">X</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">white_test</span> <span class="o">=</span> <span class="n">het_white</span><span class="p">(</span><span class="n">y_train</span><span class="p">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">-</span><span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span>  <span class="n">X</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'LM Statistic'</span><span class="p">,</span> <span class="s">'LM-Test p-value'</span><span class="p">,</span> <span class="s">'F-Statistic'</span><span class="p">,</span> <span class="s">'F-Test p-value'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">bp_test</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">white_test</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'LM Statistic': 0.2864856558843082, 'LM-Test p-value': 0.5924814566555465, 'F-Statistic': 0.2755069330542666, 'F-Test p-value': 0.6023572731912976}
+{'LM Statistic': 1.3534103948377991, 'LM-Test p-value': 0.5082889482093559, 'F-Statistic': 0.6511761525631836, 'F-Test p-value': 0.5266157302284011}
+</code></pre></div></div>
+
+<p>Since F-Test p-value on both tests are not lower than 0.05, we can determine that the model is homocedastic.</p>
+
+<h2 id="4-linear-regression">4. Linear Regression</h2>
+
+<p>We will obtain very similar results to the ones obtained from OLS</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_train</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([[62, 72, 75, 55, 64, 21, 64, 80, 67, 72, 42, 76, 76, 41, 48, 76,
+        53, 60, 42, 78, 29, 48, 55, 29, 21, 47, 81, 36, 22, 44, 15,  7,
+        42,  9, 21, 21, 16, 16,  9, 14, 12, 17,  7, 34,  8]])
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr_model</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5249181546907553
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prediction</span> <span class="o">=</span> <span class="n">lr_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s">'blue'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="./img-01-linear_regression/output_24_0.png" alt="png" /></p>
+
+<h2 id="5-l1-regularization---lasso">5. L1 Regularization - Lasso</h2>
+
+<p>Sometimes the model that is trained which will fit the data but it may fail and give a poor performance during analyzing of data (test data). This leads to overfitting. Regularization came to overcome overfitting.</p>
+
+<p>Lasso Regression (Least Absolute Shrinkage and Selection Operator) adds “Absolute value of magnitude” of coefficient, as penalty term to the loss function.
+<img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lasso</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">()</span>
+<span class="n">lasso</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">lasso</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5249161767998722
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lasso001</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mf">10e5</span><span class="p">)</span>
+<span class="n">lasso001</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+<span class="n">lasso001</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5249181544929662
+</code></pre></div></div>
+
+<h2 id="6-l2-regularization---ridge-regression">6. L2 Regularization - Ridge Regression</h2>
+
+<p>Overfitting happens when the model learns signal as well as noise in the training data and wouldn’t perform well on new/unseen data on which model wasn’t trained on. To avoid overfitting your model on training data like cross-validation sampling, reducing the number of features, pruning, regularization, etc.</p>
+
+<p>Regularization adds the penalty as model complexity increases. The regularization parameter (lambda) penalizes all the parameters except intercept so that the model generalizes the data and won’t overfit.</p>
+
+<p>Ridge regression adds “squared magnitude of the coefficient”. Ridge regression shrinks the coefficients and it helps to reduce the model complexity and multi-collinearity.</p>
+
+<p>Difference of lasso and ridge regression is that some of the coefficients can be zero i.e. some of the features are completely neglected</p>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># higher the alpha value, more restriction on the coefficients; 
+# low alpha &gt; more generalization, coefficients are barely
+# restricted and in this case linear and ridge regression resembles
+</span>
+<span class="n">rr</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span> 
+<span class="n">rr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">rr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5249181546907209
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#  comparison with alpha value
+</span><span class="n">rr100</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> 
+<span class="n">rr100</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">rr100</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.524914716103339
+</code></pre></div></div>
+
+<h2 id="7-support-vector-regression">7. Support Vector Regression</h2>
+
+<p>In simple linear regression, try to minimize the error rate. But in SVR, we try to fit the error within a certain threshold.</p>
+
+<p>Our best fit line is the one where the hyperplane has the maximum number of points.
+We are trying to do here is trying to decide a decision boundary at ‘e’ distance from the original hyperplane such that data points closest to the hyperplane or the support vectors are within that boundary line.</p>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">svr_lin</span> <span class="o">=</span> <span class="n">SVR</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s">'linear'</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="s">'auto'</span><span class="p">)</span>
+<span class="n">svr_lin_model</span> <span class="o">=</span> <span class="n">svr_lin</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/Users/albertogarcia/opt/anaconda3/envs/ds_material/lib/python3.8/site-packages/sklearn/utils/validation.py:73: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  return f(**kwargs)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">svr_lin_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span>  <span class="n">color</span><span class="o">=</span><span class="s">'orange'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="./img-01-linear_regression/output_36_0.png" alt="png" /></p>
+
+<h2 id="8-weighted-regression">8. Weighted Regression</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Artificial data: Heteroscedasticity 2 groups
+</span><span class="n">nsample</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">nsample</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="p">[</span><span class="mf">5.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">]</span>
+<span class="n">sig</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nsample</span><span class="p">)</span>
+<span class="n">w</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">nsample</span> <span class="o">*</span> <span class="mi">6</span><span class="o">/</span><span class="mi">10</span><span class="p">):]</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">nsample</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">y_true</span> <span class="o">+</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">w</span> <span class="o">*</span> <span class="n">e</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># OLS
+</span><span class="n">mod_ols</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">res_ols</span> <span class="o">=</span> <span class="n">mod_ols</span><span class="p">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res_ols</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.816
+Model:                            OLS   Adj. R-squared:                  0.812
+Method:                 Least Squares   F-statistic:                     213.3
+Date:                Sun, 28 Jun 2020   Prob (F-statistic):           2.76e-19
+Time:                        19:27:31   Log-Likelihood:                -79.189
+No. Observations:                  50   AIC:                             162.4
+Df Residuals:                      48   BIC:                             166.2
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          5.3415      0.335     15.927      0.000       4.667       6.016
+x1             0.4220      0.029     14.603      0.000       0.364       0.480
+==============================================================================
+Omnibus:                       10.279   Durbin-Watson:                   2.200
+Prob(Omnibus):                  0.006   Jarque-Bera (JB):               19.589
+Skew:                           0.437   Prob(JB):                     5.58e-05
+Kurtosis:                       5.939   Cond. No.                         23.0
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># WLS
+</span><span class="n">mod_wls</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">WLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">w</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+<span class="n">res_wls</span> <span class="o">=</span> <span class="n">mod_wls</span><span class="p">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res_wls</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                            WLS Regression Results                            
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.875
+Model:                            WLS   Adj. R-squared:                  0.873
+Method:                 Least Squares   F-statistic:                     336.5
+Date:                Sun, 28 Jun 2020   Prob (F-statistic):           2.51e-23
+Time:                        19:27:47   Log-Likelihood:                -63.245
+No. Observations:                  50   AIC:                             130.5
+Df Residuals:                      48   BIC:                             134.3
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          5.3144      0.182     29.250      0.000       4.949       5.680
+x1             0.4214      0.023     18.343      0.000       0.375       0.468
+==============================================================================
+Omnibus:                        0.101   Durbin-Watson:                   2.075
+Prob(Omnibus):                  0.951   Jarque-Bera (JB):                0.118
+Skew:                          -0.089   Prob(JB):                        0.943
+Kurtosis:                       2.841   Cond. No.                         14.6
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Compare the WLS standard errors to heteroscedasticity corrected OLS standard errors
+</span><span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">vstack</span><span class="p">([[</span><span class="n">res_wls</span><span class="p">.</span><span class="n">bse</span><span class="p">],</span> <span class="p">[</span><span class="n">res_ols</span><span class="p">.</span><span class="n">bse</span><span class="p">],</span> <span class="p">[</span><span class="n">res_ols</span><span class="p">.</span><span class="n">HC0_se</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">res_ols</span><span class="p">.</span><span class="n">HC1_se</span><span class="p">],</span> <span class="p">[</span><span class="n">res_ols</span><span class="p">.</span><span class="n">HC2_se</span><span class="p">],</span> <span class="p">[</span><span class="n">res_ols</span><span class="p">.</span><span class="n">HC3_se</span><span class="p">]])</span>
+<span class="n">se</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">se</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s">'x1'</span><span class="p">,</span> <span class="s">'const'</span><span class="p">]</span>
+<span class="n">rownames</span> <span class="o">=</span> <span class="p">[</span><span class="s">'WLS'</span><span class="p">,</span> <span class="s">'OLS'</span><span class="p">,</span> <span class="s">'OLS_HC0'</span><span class="p">,</span> <span class="s">'OLS_HC1'</span><span class="p">,</span> <span class="s">'OLS_HC3'</span><span class="p">,</span> <span class="s">'OLS_HC3'</span><span class="p">]</span>
+<span class="n">tabl</span> <span class="o">=</span> <span class="n">SimpleTable</span><span class="p">(</span><span class="n">se</span><span class="p">,</span> <span class="n">colnames</span><span class="p">,</span> <span class="n">rownames</span><span class="p">,</span> <span class="n">txt_fmt</span><span class="o">=</span><span class="n">default_txt_fmt</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tabl</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>=====================
+          x1   const 
+---------------------
+WLS     0.1817  0.023
+OLS     0.3354 0.0289
+OLS_HC0 0.2133 0.0312
+OLS_HC1 0.2177 0.0319
+OLS_HC3 0.2197 0.0322
+OLS_HC3 0.2264 0.0332
+---------------------
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Calculate OLS prediction interval
+</span><span class="n">covb</span> <span class="o">=</span> <span class="n">res_ols</span><span class="p">.</span><span class="n">cov_params</span><span class="p">()</span>
+<span class="n">prediction_var</span> <span class="o">=</span> <span class="n">res_ols</span><span class="p">.</span><span class="n">mse_resid</span> <span class="o">+</span> <span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">covb</span><span class="p">,</span><span class="n">X</span><span class="p">.</span><span class="n">T</span><span class="p">).</span><span class="n">T</span><span class="p">).</span><span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">prediction_std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">prediction_var</span><span class="p">)</span>
+<span class="n">tppf</span> <span class="o">=</span> <span class="n">stats</span><span class="p">.</span><span class="n">t</span><span class="p">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.975</span><span class="p">,</span> <span class="n">res_ols</span><span class="p">.</span><span class="n">df_resid</span><span class="p">)</span>
+
+<span class="n">prstd_ols</span><span class="p">,</span> <span class="n">iv_l_ols</span><span class="p">,</span> <span class="n">iv_u_ols</span> <span class="o">=</span> <span class="n">wls_prediction_std</span><span class="p">(</span><span class="n">res_ols</span><span class="p">)</span>
+<span class="n">prstd</span><span class="p">,</span> <span class="n">iv_l</span><span class="p">,</span> <span class="n">iv_u</span> <span class="o">=</span> <span class="n">wls_prediction_std</span><span class="p">(</span><span class="n">res_wls</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s">'o'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Data"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="s">'b-'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"True"</span><span class="p">)</span>
+<span class="c1"># OLS
+</span><span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">res_ols</span><span class="p">.</span><span class="n">fittedvalues</span><span class="p">,</span> <span class="s">'r--'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iv_u_ols</span><span class="p">,</span> <span class="s">'r--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"OLS"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iv_l_ols</span><span class="p">,</span> <span class="s">'r--'</span><span class="p">)</span>
+<span class="c1"># WLS
+</span><span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">res_wls</span><span class="p">.</span><span class="n">fittedvalues</span><span class="p">,</span> <span class="s">'g--.'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iv_u</span><span class="p">,</span> <span class="s">'g--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"WLS"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">iv_l</span><span class="p">,</span> <span class="s">'g--'</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">"best"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><img src="./img-01-linear_regression/output_43_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp_test_ols</span> <span class="o">=</span> <span class="n">het_breuschpagan</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">res_ols</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'LM Statistic'</span><span class="p">,</span> <span class="s">'LM-Test p-value'</span><span class="p">,</span> <span class="s">'F-Statistic'</span><span class="p">,</span> <span class="s">'F-Test p-value'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">bp_test_ols</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'LM Statistic': 7.24062997740727, 'LM-Test p-value': 0.007127196827086022, 'F-Statistic': 8.128048629619993, 'F-Test p-value': 0.006407136252083463}
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp_test_wls</span> <span class="o">=</span> <span class="n">het_breuschpagan</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">res_wls</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">X</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'LM Statistic'</span><span class="p">,</span> <span class="s">'LM-Test p-value'</span><span class="p">,</span> <span class="s">'F-Statistic'</span><span class="p">,</span> <span class="s">'F-Test p-value'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">bp_test_wls</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'LM Statistic': 7.165274348894885, 'LM-Test p-value': 0.00743283219904112, 'F-Statistic': 8.029307145523443, 'F-Test p-value': 0.0067121991883749305}
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<h2 id="9-multicollinearity">9. Multicollinearity</h2>
+
+<p>Multicollinearity means independent variables are highly correlated to each other. If two explanatory variables are highly correlated, it’s hard to tell, which affects the dependent variable.</p>
+
+<p><strong>Correcting Multicollinearity</strong>:</p>
+<ul>
+  <li><strong>VIF</strong>: remove variables with high VIF &gt; 5</li>
+  <li><strong>Principle Component Analysis (PCA)</strong>: cut the number of interdependent variables to a smaller set of uncorrelated components. Instead of using correlated variables, use components in the model that have <em>eigenvalue&gt;1</em>.</li>
+  <li><strong>PROC VARCLUS</strong>: run PROC VARCLUS and choose the variable that has minimum (1-R2) ratio within a cluster.</li>
+  <li><strong>Ridge Regression</strong></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_train</span> <span class="o">=</span> <span class="n">duncan_prestige</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s">'income'</span><span class="p">].</span><span class="n">values</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">duncan_prestige</span><span class="p">.</span><span class="n">data</span><span class="p">[[</span><span class="s">'education'</span><span class="p">,</span> <span class="s">'prestige'</span><span class="p">]]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vif</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">vif</span><span class="p">[</span><span class="s">"features"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">'education'</span><span class="p">,</span> <span class="s">'prestige'</span><span class="p">]</span>
+<span class="n">vif</span><span class="p">[</span><span class="s">"VIF Factor"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+<span class="n">vif</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>features</th>
+      <th>VIF Factor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>education</td>
+      <td>12.18753</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>prestige</td>
+      <td>12.18753</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">lr_model</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.7023345943966101
+</code></pre></div></div>
+
+<h3 id="91-vif">9.1 VIF</h3>
+
+<p>It provides an index that measures how much the variance of an estimated regression coefficient is increased because of collinearity. If VIF &gt; 5, then there is a problem with multicollinearity.</p>
+
+<p>If the variance inflation factor of a predictor variable is 5 this means that variance for the coefficient of that predictor variable is 5 times as large as it would be if that predictor variable were uncorrelated with the other predictor variables.</p>
+
+<h3 id="92-pca">9.2 PCA</h3>
+
+<p>PCA is a statistical procedure that transform a set of correlated variables into a set of linearly uncorrelated variables called principal components. The main idea of principal component analysis (PCA) is to reduce the dimensionality of a data set consisting of many variables correlated with each other, either heavily or lightly, while retaining the variation present in the dataset, up to the maximum extent.</p>
+
+<p>The same is done by transforming the variables to a new set of variables, which are known as the principal components (or simply, the PCs) and are orthogonal, ordered such that the retention of variation present in the original variables decreases as we move down in the order. So, in this way, the 1st principal component retains maximum variation that was present in the original components. The principal components are the eigenvectors of a covariance matrix, and hence they are orthogonal.</p>
+
+<p>Main important points to be considered:</p>
+<ol>
+  <li>Normalize the data</li>
+  <li>Calculate the covariance matrix</li>
+  <li>Calculate the eigenvalues and eigenvectors</li>
+  <li>Choosing components and forming a feature vector</li>
+  <li>Forming Principal Components</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_like</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_train</span> <span class="o">-</span> <span class="n">X_train</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="n">X_train</span><span class="p">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">sns</span><span class="p">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">X_train_like</span><span class="p">.</span><span class="n">corr</span><span class="p">(),</span> <span class="n">annot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x2b67c8e6a20&gt;
+</code></pre></div></div>
+
+<p><img src="./img-01-linear_regression/output_57_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_like_PCA</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">X_train_like_PCA</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_like</span><span class="p">.</span><span class="n">values</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PCA(copy=True, iterated_power='auto', n_components=2, random_state=None,
+    svd_solver='auto', tol=0.0, whiten=False)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_like_z</span> <span class="o">=</span> <span class="n">X_train_like_PCA</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train_like</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vif</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">vif</span><span class="p">[</span><span class="s">"features"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s">'PCA1'</span><span class="p">,</span> <span class="s">'PCA2'</span><span class="p">]</span>
+<span class="n">vif</span><span class="p">[</span><span class="s">"VIF Factor"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">variance_inflation_factor</span><span class="p">(</span><span class="n">X_train_like_z</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X_train_like_z</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+<span class="n">vif</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>features</th>
+      <th>VIF Factor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>PCA1</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>PCA2</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_like_z</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">lr_model</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train_like_z</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.7023345943966101
+</code></pre></div></div>
+
+<h3 id="93-proc-varclus">9.3 PROC VARCLUS</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">varclushi</span> <span class="kn">import</span> <span class="n">VarClusHi</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_vc</span> <span class="o">=</span> <span class="n">VarClusHi</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">maxeigval2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">maxclus</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_vc</span><span class="p">.</span><span class="n">info</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cluster</th>
+      <th>N_Vars</th>
+      <th>Eigval1</th>
+      <th>Eigval2</th>
+      <th>VarProp</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>2</td>
+      <td>1.851916</td>
+      <td>0.148084</td>
+      <td>0.925958</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_vc</span><span class="p">.</span><span class="n">rsquare</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Cluster</th>
+      <th>Variable</th>
+      <th>RS_Own</th>
+      <th>RS_NC</th>
+      <th>RS_Ratio</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>education</td>
+      <td>0.925958</td>
+      <td>0</td>
+      <td>0.074042</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>prestige</td>
+      <td>0.925958</td>
+      <td>0</td>
+      <td>0.074042</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_train</span> <span class="o">-</span> <span class="n">X_train</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">X_train_interact</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_train_ce</span><span class="p">[</span><span class="s">'education'</span><span class="p">]</span> <span class="o">*</span> <span class="n">X_train_ce</span><span class="p">[</span><span class="s">'prestige'</span><span class="p">]).</span><span class="n">values</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lr</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">lr_model</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_interact</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">y_train</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">lr_model</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train_interact</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">y_train</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5859853337918666
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+
+      </section>
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>
