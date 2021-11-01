@@ -2,7 +2,7 @@
 layout: index
 ---
 
-# Featured Projects
+## Featured Projects
 
 
 

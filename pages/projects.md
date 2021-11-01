@@ -2,7 +2,7 @@
 layout: index
 ---
 
-# Projects
+## Projects
 
 [Back](../index.html)
 

@@ -56,7 +56,7 @@ a:hover small {
 }
 
 .wrapper {
-  width:1200px;
+  width:100%;
   margin:0 auto;
 }
 
@@ -119,11 +119,22 @@ kbd {
 }
 
 header {
-  width:400px;
+  width:450px;
   float:left;
   position:fixed;
   -webkit-font-smoothing:subpixel-antialiased;
 }
+
+header img {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  padding-bottom: 5px;
+  
+  overflow: hidden;
+}
+
 
 ul.downloads {
   list-style:none;
@@ -186,7 +197,8 @@ strong {
 }
 
 section {
-  width:500px;
+  padding-top: 10px;
+  width:800px;
   float:right;
   padding-bottom:50px;
 }
