@@ -1,6 +1,7 @@
 title: Alberto García Hernández
-logo: /assets/img/bprofile.png
-description: Data Scientist. Personal Site
+profile: /assets/img/bprofile.png
+description: Data Scientist
 show_downloads: true
 google_analytics:
 theme: jekyll-theme-minimal
+
