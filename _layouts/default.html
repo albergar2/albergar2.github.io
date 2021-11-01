@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: "en-US" }}">
   <head>
-    
+    <title>Alberto García | Data Scientist</title>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,27 +12,35 @@
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
     <![endif]-->
-    {% include head-custom.html %}
+  
   </head>
   <body>
     <div class="wrapper">
       <header>
-        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
-        <h3>{{ site.description | default: site.github.project_tagline }}</h3>
-        <p> Machine Learning | NLP | Statictics | Software Engineering | Economics</p>
-        <img src="{{site.profile | relative_url}}" alt="Profile" />
+        <h1><a href="{{ "/" | absolute_url }}">Alberto García Hernández</a></h1>
+        <h3>Data Scientist</h3>
+        <!-- <p> Machine Learning | NLP | Statistics | Software Engineering | Economics</p> -->
+        <p class=bio>
+          Data Scientist with 3 years of experience in ML and NLP, building and deploying 
+          end-to-end (CI/CD) data products in the financial and telecom industries.
+          Proficient in Python, NLP, SQL, TensorFlow, Spark and statistics.
+        </p>
 
-        <ul class="downloads">
+        <div>
+          <img src="{{site.profile | relative_url}}" alt="Profile" />
+        </div>
+        
+
+        <ul class="menu-buttons">
           <li><a href="https://www.linkedin.com/in/albergar2/">LinkedIn</a></li>
-          <li><a href="http://www.github.com/albergar2">View My<strong>GitHub</strong></a></li>
-          <li><a href="http://www.github.com/albergar2">View My<strong>Projects</strong></a></li>
-
+          <li><a href="http://www.github.com/albergar2">GitHub</a></li>
+          <li><a href="http://www.github.com/albergar2">Projects</a></li>
         </ul>
 
         
-
+        
       </header>
-      <section>
+      <section class=center>
 
       {{ content }}
 

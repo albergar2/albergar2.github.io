@@ -4,7 +4,7 @@ layout: index
 
 ## Projects
 
-[Back](../index.html)
+[Back](./)
 
 Text can be **bold**, _italic_, or ~~strikethrough~~.
 

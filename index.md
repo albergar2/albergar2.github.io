@@ -6,5 +6,5 @@ layout: index
 
 
 
-[Show more](./pages/projects.html)
+[Show more](./projects.html)
 
