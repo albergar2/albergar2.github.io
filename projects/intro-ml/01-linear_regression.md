@@ -1,4 +1,9 @@
-# Supervised Machine Learning: Linear Regression
+---
+layout: post
+title: "Supervised Machine Learning: Linear Regression"
+author: Alberto García Hernández
+date: "01/01/2021"
+---
 
 [Back](../../)
 #### [Download Notebook](https://github.com/albergar2/data_science_material/blob/master/ML/supervised/01-linear_regression.ipynb)
