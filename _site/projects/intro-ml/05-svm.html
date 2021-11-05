@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Supervised Machine Learning: SVM Clasiffication | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Supervised Machine Learning: SVM Clasiffication" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-ml/05-svm.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-ml/05-svm.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Supervised Machine Learning: SVM Clasiffication" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/intro-ml/05-svm.html","headline":"Supervised Machine Learning: SVM Clasiffication","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/intro-ml/05-svm.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Supervised Machine Learning: SVM Clasiffication</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/supervised/05-svm.ipynb">Download Notebook</a></h4>
+
+<p>Support Vector Machine (SVM) is a supervised machine learning algorithm capable of performing classification, regression and even outlier detection. The LSVM algorithm will select a line that not only separates the two classes but stays as far away from the closest samples as possible. In fact, the “support vector” in “support vector machine” refers to two position vectors drawn from the origin to the points which dictate the decision boundary.</p>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<p><strong>Advantages</strong></p>
+<ol>
+  <li>Effective when the number of features is quite large.</li>
+  <li>It works effectively even if the number of features is greater than the number of samples.</li>
+  <li>Non-Linear data can also be classified using customized hyperplanes built by using kernel trick.</li>
+  <li>It is a robust model to solve prediction problems since it maximizes margin.</li>
+</ol>
+
+<p><strong>Disadvantages</strong></p>
+<ol>
+  <li>The wrong choice of the kernel can lead to an increase in error percentage.</li>
+  <li>With a greater number of samples, it starts giving poor performances.</li>
+  <li>SVMs have good generalization performance, but they can be extremely slow in the test phase.</li>
+  <li>SVMs have high algorithmic complexity and extensive memory requirements due to the use of quadratic programming.</li>
+</ol>
+
+<p>We have two types of SVM classifiers:</p>
+
+<ol>
+  <li><strong>Linear</strong>: data points are expected to be separated by some apparent gap. Therefore, the SVM algorithm predicts a straight hyperplane dividing the two classes. The hyperplane is also called as maximum margin hyperplane.</li>
+</ol>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<ol>
+  <li><strong>Non-linear</strong>: It is possible that our data points are not linearly separable in a p- dimensional space, but can be linearly separable in a higher dimension. Kernel tricks make it possible to draw nonlinear hyperplanes. Some standard kernels are a) Polynomial Kernel b) RBF kernel(mostly used).</li>
+</ol>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<h2 id="linear-svm">Linear SVM</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_blobs</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">svm</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_blobs</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">250</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                  <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cluster_std</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'winter'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.PathCollection at 0x7ff045e4c580&gt;
+</code></pre></div></div>
+
+<p><img src="img-05-svm/output_7_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span> <span class="o">=</span> <span class="n">svm</span><span class="p">.</span><span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s">'linear'</span><span class="p">)</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SVC(kernel='linear')
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">yy</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">xx</span> <span class="o">-</span> <span class="n">clf</span><span class="p">.</span><span class="n">intercept_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">h0</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="s">'k-'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"SVM_classifier"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'winter'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="img-05-svm/output_10_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9523809523809523
+</code></pre></div></div>
+
+<h2 id="non-linear-svm">Non-linear SVM</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span> 
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">make_circles</span> 
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span> 
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+                     <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">500</span><span class="p">))</span>
+<span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">logical_xor</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'winter'</span><span class="p">)</span> 
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span> 
+</code></pre></div></div>
+
+<p><img src="img-05-svm/output_15_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># fit the model
+</span><span class="n">clf</span> <span class="o">=</span> <span class="n">svm</span><span class="p">.</span><span class="n">NuSVC</span><span class="p">(</span><span class="n">gamma</span><span class="o">=</span><span class="s">'auto'</span><span class="p">)</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NuSVC(gamma='auto')
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plot the decision function for each datapoint on the grid
+</span><span class="n">Z</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">decision_function</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">c_</span><span class="p">[</span><span class="n">xx</span><span class="p">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">yy</span><span class="p">.</span><span class="n">ravel</span><span class="p">()])</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xx</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">contours</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s">'dashed'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Y</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'winter'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(())</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">(())</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="img-05-svm/output_17_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Supervised Machine Learning: Ensemble Methods | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Supervised Machine Learning: Ensemble Methods" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-ml/04-ensemble_methods.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-ml/04-ensemble_methods.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Supervised Machine Learning: Ensemble Methods" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/intro-ml/04-ensemble_methods.html","headline":"Supervised Machine Learning: Ensemble Methods","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/intro-ml/04-ensemble_methods.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Supervised Machine Learning: Ensemble Methods</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/supervised/04-ensemble_methods.ipynb">Download Notebook</a></h4>
+
+<p><strong>Ensemble methods</strong> combine several decision trees to produce better predictive performance than utilizing a single decision tree. The main principle behind the ensemble model is that a group of weak learners come together to form a strong learner.</p>
+
+<ol>
+  <li>
+    <p><strong>Bagging (Bootstrap Aggregation)</strong> is used when our goal is to reduce the variance of a decision tree by creating several subsets of data from the training sample chosen randomly with replacement. Now, each collection of subset data is used to train their decision trees. As a result, we end up with an ensemble of different models. Average of all the predictions from different trees are used which is more robust than a single decision tree.</p>
+  </li>
+  <li>
+    <p><strong>Boosting</strong> new models are created that predict the residuals or errors of prior models and then added together to make the final prediction. It is called gradient boosting because it uses a gradient descent algorithm to minimize the loss when adding new models. Boosting algorithms convert a set of weak learners into a single strong learner by initializing a strong learner (usually a decision tree) and iteratively creating a weak learner that is added to the strong learner. They differ on how they create the weak learners during the iterative process.</p>
+  </li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_wine</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">AdaBoostClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingClassifier</span>
+<span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+
+<h2 id="1-load-data">1. Load Data</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wine</span> <span class="o">=</span> <span class="n">load_wine</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">wine</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">iris</span><span class="p">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">wine</span><span class="p">.</span><span class="n">target</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>alcohol</th>
+      <th>malic_acid</th>
+      <th>ash</th>
+      <th>alcalinity_of_ash</th>
+      <th>magnesium</th>
+      <th>total_phenols</th>
+      <th>flavanoids</th>
+      <th>nonflavanoid_phenols</th>
+      <th>proanthocyanins</th>
+      <th>color_intensity</th>
+      <th>hue</th>
+      <th>od280/od315_of_diluted_wines</th>
+      <th>proline</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>14.23</td>
+      <td>1.71</td>
+      <td>2.43</td>
+      <td>15.6</td>
+      <td>127.0</td>
+      <td>2.80</td>
+      <td>3.06</td>
+      <td>0.28</td>
+      <td>2.29</td>
+      <td>5.64</td>
+      <td>1.04</td>
+      <td>3.92</td>
+      <td>1065.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>13.20</td>
+      <td>1.78</td>
+      <td>2.14</td>
+      <td>11.2</td>
+      <td>100.0</td>
+      <td>2.65</td>
+      <td>2.76</td>
+      <td>0.26</td>
+      <td>1.28</td>
+      <td>4.38</td>
+      <td>1.05</td>
+      <td>3.40</td>
+      <td>1050.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>13.16</td>
+      <td>2.36</td>
+      <td>2.67</td>
+      <td>18.6</td>
+      <td>101.0</td>
+      <td>2.80</td>
+      <td>3.24</td>
+      <td>0.30</td>
+      <td>2.81</td>
+      <td>5.68</td>
+      <td>1.03</td>
+      <td>3.17</td>
+      <td>1185.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>14.37</td>
+      <td>1.95</td>
+      <td>2.50</td>
+      <td>16.8</td>
+      <td>113.0</td>
+      <td>3.85</td>
+      <td>3.49</td>
+      <td>0.24</td>
+      <td>2.18</td>
+      <td>7.80</td>
+      <td>0.86</td>
+      <td>3.45</td>
+      <td>1480.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>13.24</td>
+      <td>2.59</td>
+      <td>2.87</td>
+      <td>21.0</td>
+      <td>118.0</td>
+      <td>2.80</td>
+      <td>2.69</td>
+      <td>0.39</td>
+      <td>1.82</td>
+      <td>4.32</td>
+      <td>1.04</td>
+      <td>2.93</td>
+      <td>735.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2,
+       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+       2, 2])
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="2-random-forest">2. Random Forest</h2>
+
+<p>Random Forest is an ensemble machine learning algorithm that follows the bagging technique whose base estimators are decision trees. Random forest randomly selects a set of features that are used to decide the best split at each node of the decision tree.</p>
+
+<ol>
+  <li>Random subsets are created from the original dataset (bootstrapping).</li>
+  <li>At each node in the decision tree, only a random set of features are considered to decide the best split.</li>
+  <li>A decision tree model is fitted on each of the subsets.</li>
+  <li>
+    <p>The final prediction is calculated by averaging the predictions from all decision trees.</p>
+  </li>
+  <li><strong>n_estimators</strong>: It defines the number of decision trees to be created in a random forest.</li>
+  <li><strong>criterion</strong>: “Gini” or “Entropy.”</li>
+  <li><strong>min_samples_split</strong>: Used to define the minimum number of samples required in a leaf node before a split is attempted</li>
+  <li><strong>max_features</strong>: It defines the maximum number of features allowed for the split in each decision tree.</li>
+  <li><strong>n_jobs</strong>: The number of jobs to run in parallel for both fit and predict. Always keep (-1) to use all the cores for parallel processing.</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
+                             <span class="n">criterion</span><span class="o">=</span><span class="s">'gini'</span><span class="p">,</span> 
+                             <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
+                             <span class="n">max_features</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+                             <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RandomForestClassifier(max_features=4, min_samples_split=5, n_jobs=-1)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9777777777777777
+</code></pre></div></div>
+
+<h2 id="3-adaboost">3. AdaBoost</h2>
+
+<p>At each iteration, <strong>Adaptive Boosting</strong> changes the sample distribution by modifying the weights attached to each of the instances. It increases the weights of the wrongly predicted instances and decreases the ones of the correctly predicted instances. The weak learner thus focuses more on the difficult instances. After being trained, the weak learner is added to the strong one according to his performance (so-called alpha weight). The higher it performs, the more it contributes to the strong learner.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span> <span class="o">=</span> <span class="n">AdaBoostClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>AdaBoostClassifier(n_estimators=100, random_state=0)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9555555555555556
+</code></pre></div></div>
+
+<h2 id="4-gradient-boosting">4. Gradient Boosting</h2>
+
+<p><strong>Gradient boosting</strong> trains the weak learner on the remaining errors (so-called pseudo-residuals) of the strong learner. It is another way to give more importance to the difficult instances. At each iteration, the pseudo-residuals are computed and a weak learner is fitted to these pseudo-residuals. Then, the contribution of the weak learner (so-called multiplier) to the strong one is computed by using a gradient descent optimization process. The computed contribution is the one minimizing the overall error of the strong learner.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span> <span class="o">=</span> <span class="n">GradientBoostingClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GradientBoostingClassifier(random_state=0)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9555555555555556
+</code></pre></div></div>
+
+<h2 id="5-xgboost">5. XGBoost</h2>
+
+<p>Extreme Gradient Boosting (XGBoost) is a more efficient version of gradient boosting framework containing both a linear model solver and tree learning algorithms. The reason behind it’s efficiency is it’s capacity to do parallel computing on a single machine.</p>
+
+<p>The problem with general boosting was</p>
+<ul>
+  <li>Can’t extract the linear combination of features</li>
+  <li>Small predictive power (high variance)</li>
+</ul>
+
+<p>Gradient boosting approach:</p>
+<ul>
+  <li>Control tree structure (maximum depth, minimum samples per leaf),</li>
+  <li>Control learning rate (shrinkage),</li>
+  <li>Reduce variance by introducing randomness (stochastic gradient boosting – using random subsamples of instances and features)</li>
+</ul>
+
+<p>XGBoost improved it with some good features like:</p>
+<ul>
+  <li>Good bias-variance (simple-predictive) trade-off “out of the box”</li>
+  <li>Great computation speed</li>
+</ul>
+
+<p>XGBoost’s objective function is a sum of a specific loss function evaluated overall predictions and a sum of regularization term for all predictors (KK trees).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span> <span class="o">=</span> <span class="n">XGBClassifier</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+              colsample_bynode=1, colsample_bytree=1, gamma=0, gpu_id=-1,
+              importance_type='gain', interaction_constraints='',
+              learning_rate=0.300000012, max_delta_step=0, max_depth=6,
+              min_child_weight=1, missing=nan, monotone_constraints='()',
+              n_estimators=100, n_jobs=0, num_parallel_tree=1,
+              objective='multi:softprob', random_state=0, reg_alpha=0,
+              reg_lambda=1, scale_pos_weight=None, subsample=1,
+              tree_method='exact', validate_parameters=1, verbosity=None)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9555555555555556
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>

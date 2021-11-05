@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Supervised Machine Learning: Logistic Regression | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Supervised Machine Learning: Logistic Regression" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-ml/02-logistic_regression.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-ml/02-logistic_regression.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Supervised Machine Learning: Logistic Regression" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/intro-ml/02-logistic_regression.html","headline":"Supervised Machine Learning: Logistic Regression","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/intro-ml/02-logistic_regression.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Supervised Machine Learning: Logistic Regression</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/supervised/02-logistic_regression.ipynb">Download Notebook</a></h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="n">sm</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> 
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+</code></pre></div></div>
+
+<h2 id="1-load-data">1. Load Data</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">spector_data</span> <span class="o">=</span> <span class="n">sm</span><span class="p">.</span><span class="n">datasets</span><span class="p">.</span><span class="n">spector</span><span class="p">.</span><span class="n">load_pandas</span><span class="p">().</span><span class="n">data</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">spector_data</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>GPA</th>
+      <th>TUCE</th>
+      <th>PSI</th>
+      <th>GRADE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2.66</td>
+      <td>20.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.89</td>
+      <td>22.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.28</td>
+      <td>24.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2.92</td>
+      <td>12.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>4.00</td>
+      <td>21.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="2-logistic-regression">2. Logistic Regression</h2>
+
+<p>Logistic Regression is used when the dependent variable (target) is categorical.
+<img src="attachment:imagen.png" alt="imagen.png" />
+This implementation is for binary logistic regression. For data with more than 2 classes, softmax re gression has to be used.</p>
+
+<p><img src="attachment:imagen.png" alt="imagen.png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span> <span class="o">=</span> <span class="n">spector_data</span><span class="p">[[</span><span class="s">'GPA'</span><span class="p">,</span> <span class="s">'TUCE'</span><span class="p">,</span> <span class="s">'PSI'</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">spector_data</span><span class="p">[[</span><span class="s">'GRADE'</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">logit_model</span><span class="o">=</span><span class="n">sm</span><span class="p">.</span><span class="n">Logit</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">X</span><span class="p">)</span>
+<span class="n">result</span><span class="o">=</span><span class="n">logit_model</span><span class="p">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">summary2</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Optimization terminated successfully.
+         Current function value: 0.586580
+         Iterations 5
+                        Results: Logit
+==============================================================
+Model:              Logit            Pseudo R-squared: 0.088  
+Dependent Variable: y                AIC:              43.5411
+Date:               2020-06-21 13:44 BIC:              47.9384
+No. Observations:   32               Log-Likelihood:   -18.771
+Df Model:           2                LL-Null:          -20.592
+Df Residuals:       29               LLR p-value:      0.16184
+Converged:          1.0000           Scale:            1.0000 
+No. Iterations:     5.0000                                    
+----------------------------------------------------------------
+         Coef.    Std.Err.      z      P&gt;|z|     [0.025   0.975]
+----------------------------------------------------------------
+GPA      0.2993     0.6815    0.4392   0.6605   -1.0365   1.6351
+TUCE    -0.1015     0.0996   -1.0192   0.3081   -0.2966   0.0937
+PSI      1.6364     0.8126    2.0137   0.0440    0.0437   3.2291
+==============================================================
+</code></pre></div></div>
+
+<p>Looking at the p-values we keep only the ones that are lower than 0.5</p>
+
+<h2 id="3-logistic-regression-model-fitting">3. Logistic Regression Model Fitting</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[[</span><span class="s">'PSI'</span><span class="p">]]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">logreg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">logreg</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+                   intercept_scaling=1, l1_ratio=None, max_iter=100,
+                   multi_class='auto', n_jobs=None, penalty='l2',
+                   random_state=None, solver='lbfgs', tol=0.0001, verbose=0,
+                   warm_start=False)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_pred</span> <span class="o">=</span> <span class="n">logreg</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Accuracy of logistic regression classifier on test set: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">logreg</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Accuracy of logistic regression classifier on test set: 0.70
+</code></pre></div></div>
+
+<h2 id="4-metrics">4. Metrics</h2>
+
+<ul>
+  <li>
+    <p>Precision: tp / (tp + fp). The precision is intuitively the ability of the classifier to not label a sample as positive if it is negative.</p>
+  </li>
+  <li>
+    <p>Recall: tp / (tp + fn). The recall is intuitively the ability of the classifier to find all the positive samples.</p>
+  </li>
+  <li>
+    <p>F-beta score: weighted harmonic mean of the precision and recall, where an F-beta score reaches its best value at 1 and worst score at 0. The F-beta score weights the recall more than the precision by a factor of beta. beta = 1.0 means recall and precision are equally important.</p>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="n">confusion_matrix</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[[7 0]
+ [3 0]]
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">classification_report</span>
+<span class="k">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">zero_division</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>              precision    recall  f1-score   support
+
+         0.0       0.70      1.00      0.82         7
+         1.0       1.00      0.00      0.00         3
+
+    accuracy                           0.70        10
+   macro avg       0.85      0.50      0.41        10
+weighted avg       0.79      0.70      0.58        10
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>

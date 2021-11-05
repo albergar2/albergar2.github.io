@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Supervised Machine Learning: Naive Bayes | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Supervised Machine Learning: Naive Bayes" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-ml/06-naive_bayes.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-ml/06-naive_bayes.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Supervised Machine Learning: Naive Bayes" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/intro-ml/06-naive_bayes.html","headline":"Supervised Machine Learning: Naive Bayes","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/intro-ml/06-naive_bayes.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Supervised Machine Learning: Naive Bayes</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/supervised/06-naive_bayes.ipynb">Download Notebook</a></h4>
+
+<p>Bayes’ Theorem finds the probability of an event occurring given the probability of another event that has already occurred. Now, with regards to our dataset, we can apply Bayes’ theorem in following way:</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>P(y</td>
+      <td>X) = {P(X</td>
+      <td>y) P(y)}/{P(X)}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>where, y is class variable and X is a dependent feature vector (of size n) where:</p>
+
+<p>X = (x_1,x_2,x_3,…..,x_n)</p>
+
+<h2 id="1-naive-bayes-classification">1. Naive Bayes Classification</h2>
+
+<ol>
+  <li>We assume the features are independent</li>
+  <li>Each feature is given the same importance (weight)</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Assigning features and label variables
+</span><span class="n">weather</span><span class="o">=</span><span class="p">[</span><span class="s">'Sunny'</span><span class="p">,</span><span class="s">'Sunny'</span><span class="p">,</span><span class="s">'Overcast'</span><span class="p">,</span><span class="s">'Rainy'</span><span class="p">,</span><span class="s">'Rainy'</span><span class="p">,</span><span class="s">'Rainy'</span><span class="p">,</span><span class="s">'Overcast'</span><span class="p">,</span><span class="s">'Sunny'</span><span class="p">,</span><span class="s">'Sunny'</span><span class="p">,</span>
+         <span class="s">'Rainy'</span><span class="p">,</span><span class="s">'Sunny'</span><span class="p">,</span><span class="s">'Overcast'</span><span class="p">,</span><span class="s">'Overcast'</span><span class="p">,</span><span class="s">'Rainy'</span><span class="p">]</span>
+<span class="n">temp</span><span class="o">=</span><span class="p">[</span><span class="s">'Hot'</span><span class="p">,</span><span class="s">'Hot'</span><span class="p">,</span><span class="s">'Hot'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">,</span><span class="s">'Cool'</span><span class="p">,</span><span class="s">'Cool'</span><span class="p">,</span><span class="s">'Cool'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">,</span><span class="s">'Cool'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">,</span><span class="s">'Hot'</span><span class="p">,</span><span class="s">'Mild'</span><span class="p">]</span>
+
+<span class="n">play</span><span class="o">=</span><span class="p">[</span><span class="s">'No'</span><span class="p">,</span><span class="s">'No'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'No'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'No'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'Yes'</span><span class="p">,</span><span class="s">'No'</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'weather'</span><span class="p">:</span><span class="n">weather</span><span class="p">,</span><span class="s">'temp'</span><span class="p">:</span><span class="n">temp</span><span class="p">,</span> <span class="s">'play'</span><span class="p">:</span><span class="n">play</span><span class="p">})</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weather</th>
+      <th>temp</th>
+      <th>play</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sunny</td>
+      <td>Hot</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Sunny</td>
+      <td>Hot</td>
+      <td>No</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Overcast</td>
+      <td>Hot</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Rainy</td>
+      <td>Mild</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Rainy</td>
+      <td>Cool</td>
+      <td>Yes</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">le</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="p">.</span><span class="n">LabelEncoder</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'weather'</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'weather'</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'temp'</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'temp'</span><span class="p">])</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'play'</span><span class="p">]</span> <span class="o">=</span> <span class="n">le</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'play'</span><span class="p">])</span>
+<span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>weather</th>
+      <th>temp</th>
+      <th>play</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">features</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s">'weather'</span><span class="p">,</span> <span class="s">'temp'</span><span class="p">]]</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'play'</span><span class="p">]</span>
+
+<span class="c1">#Create a Gaussian Classifier
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+
+<span class="c1"># Train the model using the training sets
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">label</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GaussianNB()
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span> <span class="c1"># 0:Overcast, 2:Mild
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1])
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.7142857142857143
+</code></pre></div></div>
+
+<h2 id="2-gaussian-naive-bayes">2. Gaussian Naive Bayes</h2>
+<p>Continuous values associated with each feature are assumed to be distributed according to a Gaussian (normal) distribution. This is as simple as calculating the mean and standard deviation values of each input variable (x) for each class value.</p>
+
+<ul>
+  <li>Mean (x) = 1/n * sum(x)</li>
+  <li>Standard deviation(x) = sqrt (1/n * sum(xi-mean(x)^2 ))</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="n">return_X_y</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gnb</span> <span class="o">=</span> <span class="n">GaussianNB</span><span class="p">()</span>
+<span class="n">gnb</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GaussianNB()
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gnb</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.9466666666666667
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_pred</span> <span class="o">=</span> <span class="n">gnb</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"Number of mislabeled points out of a total %d points : %d"</span>
+      <span class="o">%</span> <span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">y_test</span> <span class="o">!=</span> <span class="n">y_pred</span><span class="p">).</span><span class="nb">sum</span><span class="p">()))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Number of mislabeled points out of a total 75 points : 4
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>
