@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Data Cleaning Guide | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Data Cleaning Guide" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/ds-material/01-data_cleaning.html" />
+<meta property="og:url" content="http://localhost:4000/projects/ds-material/01-data_cleaning.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Data Cleaning Guide" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/ds-material/01-data_cleaning.html","headline":"Data Cleaning Guide","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/ds-material/01-data_cleaning.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Data Cleaning Guide</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/01_Data_Cleaning.ipynb">Download Notebook</a></h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+
+<h2 id="1-basic-functions">1. Basic Functions</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+
+<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="n">df_iris</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">c_</span><span class="p">[</span><span class="n">iris</span><span class="p">[</span><span class="s">'data'</span><span class="p">],</span> <span class="n">iris</span><span class="p">[</span><span class="s">'target'</span><span class="p">]],</span>
+                       <span class="n">columns</span><span class="o">=</span> <span class="n">iris</span><span class="p">[</span><span class="s">'feature_names'</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s">'target'</span><span class="p">])</span>
+
+<span class="n">df_iris</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sepal length (cm)</th>
+      <th>sepal width (cm)</th>
+      <th>petal length (cm)</th>
+      <th>petal width (cm)</th>
+      <th>target</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>5.1</td>
+      <td>3.5</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>4.9</td>
+      <td>3.0</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4.7</td>
+      <td>3.2</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4.6</td>
+      <td>3.1</td>
+      <td>1.5</td>
+      <td>0.2</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5.0</td>
+      <td>3.6</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="11-constant-values">1.1 Constant Values</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df_iris</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_iris</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">df_iris</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">nunique</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">df_iris</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        
+<span class="k">print</span><span class="p">(</span><span class="n">df_iris</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(150, 5)
+(150, 5)
+</code></pre></div></div>
+
+<h3 id="12-duplicates">1.2 Duplicates</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df_iris</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">df_iris</span><span class="p">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df_iris</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(150, 5)
+(149, 5)
+</code></pre></div></div>
+
+<h3 id="13-missing-data">1.3 Missing Data</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_missings</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/missings.csv'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">df_missings</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>18</th>
+      <th>19</th>
+      <th>20</th>
+      <th>21</th>
+      <th>22</th>
+      <th>23</th>
+      <th>24</th>
+      <th>25</th>
+      <th>26</th>
+      <th>27</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2</td>
+      <td>1</td>
+      <td>530101</td>
+      <td>38.50</td>
+      <td>66</td>
+      <td>28</td>
+      <td>3</td>
+      <td>3</td>
+      <td>?</td>
+      <td>2</td>
+      <td>...</td>
+      <td>45.0</td>
+      <td>8.4</td>
+      <td>?</td>
+      <td>?</td>
+      <td>2</td>
+      <td>2</td>
+      <td>11300</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>534817</td>
+      <td>39.2</td>
+      <td>88</td>
+      <td>20</td>
+      <td>?</td>
+      <td>?</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>50</td>
+      <td>85</td>
+      <td>2</td>
+      <td>2</td>
+      <td>3</td>
+      <td>2</td>
+      <td>2208</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2</td>
+      <td>1</td>
+      <td>530334</td>
+      <td>38.30</td>
+      <td>40</td>
+      <td>24</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>33.0</td>
+      <td>6.7</td>
+      <td>?</td>
+      <td>?</td>
+      <td>1</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>9</td>
+      <td>5290409</td>
+      <td>39.10</td>
+      <td>164</td>
+      <td>84</td>
+      <td>4</td>
+      <td>1</td>
+      <td>6</td>
+      <td>2</td>
+      <td>...</td>
+      <td>48.0</td>
+      <td>7.2</td>
+      <td>3</td>
+      <td>5.3</td>
+      <td>2</td>
+      <td>1</td>
+      <td>2208</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2</td>
+      <td>1</td>
+      <td>530255</td>
+      <td>37.30</td>
+      <td>104</td>
+      <td>35</td>
+      <td>?</td>
+      <td>?</td>
+      <td>6</td>
+      <td>2</td>
+      <td>...</td>
+      <td>74.0</td>
+      <td>7.4</td>
+      <td>?</td>
+      <td>?</td>
+      <td>2</td>
+      <td>2</td>
+      <td>4300</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 28 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_missings</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'?'</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">nan</span><span class="p">)</span>
+
+<span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'missings'</span><span class="p">:</span><span class="n">df_missings</span><span class="p">.</span><span class="n">isnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">(),</span> 
+                   <span class="s">'percent_missing'</span><span class="p">:</span> <span class="n">df_missings</span><span class="p">.</span><span class="n">isnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_missings</span><span class="p">)},</span> 
+             <span class="n">index</span><span class="o">=</span><span class="n">df_missings</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>missings</th>
+      <th>percent_missing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0.003333</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>60</td>
+      <td>0.200000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>24</td>
+      <td>0.080000</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>58</td>
+      <td>0.193333</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>56</td>
+      <td>0.186667</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>69</td>
+      <td>0.230000</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>47</td>
+      <td>0.156667</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>32</td>
+      <td>0.106667</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>55</td>
+      <td>0.183333</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>44</td>
+      <td>0.146667</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>56</td>
+      <td>0.186667</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>104</td>
+      <td>0.346667</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>106</td>
+      <td>0.353333</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>247</td>
+      <td>0.823333</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>102</td>
+      <td>0.340000</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>118</td>
+      <td>0.393333</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>29</td>
+      <td>0.096667</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>33</td>
+      <td>0.110000</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>165</td>
+      <td>0.550000</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>198</td>
+      <td>0.660000</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>1</td>
+      <td>0.003333</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_missings</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">df_missings</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="n">df_missings</span><span class="p">[</span><span class="mi">3</span><span class="p">].</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">df_missings</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">df_missings</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="n">df_missings</span><span class="p">[</span><span class="mi">5</span><span class="p">].</span><span class="n">median</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df_missings</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">df_missings</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    
+<span class="n">df_missings_val</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">.</span><span class="n">values</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Missing: %d'</span> <span class="o">%</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df_missings_val</span><span class="p">).</span><span class="n">flatten</span><span class="p">()))</span>
+
+<span class="n">imputer</span> <span class="o">=</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s">'mean'</span><span class="p">)</span>
+<span class="n">df_missings_val</span> <span class="o">=</span> <span class="n">imputer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_missings_val</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Missing: %d'</span> <span class="o">%</span> <span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df_missings_val</span><span class="p">).</span><span class="n">flatten</span><span class="p">()))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Missing: 1487
+Missing: 0
+</code></pre></div></div>
+
+<h4 id="categorical-data">Categorical data</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cat_data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/categorical_input.csv'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">cat_data</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>'40-49'</td>
+      <td>'premeno'</td>
+      <td>'15-19'</td>
+      <td>'0-2'</td>
+      <td>'yes'</td>
+      <td>'3'</td>
+      <td>'right'</td>
+      <td>'left_up'</td>
+      <td>'no'</td>
+      <td>'recurrence-events'</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>'50-59'</td>
+      <td>'ge40'</td>
+      <td>'15-19'</td>
+      <td>'0-2'</td>
+      <td>'no'</td>
+      <td>'1'</td>
+      <td>'right'</td>
+      <td>'central'</td>
+      <td>'no'</td>
+      <td>'no-recurrence-events'</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>'50-59'</td>
+      <td>'ge40'</td>
+      <td>'35-39'</td>
+      <td>'0-2'</td>
+      <td>'no'</td>
+      <td>'2'</td>
+      <td>'left'</td>
+      <td>'left_low'</td>
+      <td>'no'</td>
+      <td>'recurrence-events'</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>'40-49'</td>
+      <td>'premeno'</td>
+      <td>'35-39'</td>
+      <td>'0-2'</td>
+      <td>'yes'</td>
+      <td>'3'</td>
+      <td>'right'</td>
+      <td>'left_low'</td>
+      <td>'yes'</td>
+      <td>'no-recurrence-events'</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>'40-49'</td>
+      <td>'premeno'</td>
+      <td>'30-34'</td>
+      <td>'3-5'</td>
+      <td>'yes'</td>
+      <td>'2'</td>
+      <td>'left'</td>
+      <td>'right_up'</td>
+      <td>'no'</td>
+      <td>'recurrence-events'</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s">'missings'</span><span class="p">:</span><span class="n">cat_data</span><span class="p">.</span><span class="n">isnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">(),</span> 
+                   <span class="s">'percent_missing'</span><span class="p">:</span> <span class="n">cat_data</span><span class="p">.</span><span class="n">isnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">cat_data</span><span class="p">)},</span> 
+             <span class="n">index</span><span class="o">=</span><span class="n">cat_data</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>missings</th>
+      <th>percent_missing</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>8</td>
+      <td>0.027972</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>0.003497</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cat_data</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">cat_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cat_data</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="n">cat_data</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mode</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div></div>
+
+<h4 id="simpleimputer--regression--crossvalidation">SimpleImputer + Regression + Crossvalidation</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RepeatedStratifiedKFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="n">df_missings_val</span> <span class="o">=</span> <span class="n">df_missings</span><span class="p">.</span><span class="n">values</span>
+<span class="n">ix</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">df_missings_val</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">23</span><span class="p">]</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">df_missings_val</span><span class="p">[:,</span> <span class="n">ix</span><span class="p">],</span> <span class="n">df_missings_val</span><span class="p">[:,</span> <span class="mi">23</span><span class="p">]</span>
+
+<span class="n">strategies</span> <span class="o">=</span> <span class="p">[</span><span class="s">'mean'</span><span class="p">,</span> <span class="s">'median'</span><span class="p">,</span> <span class="s">'most_frequent'</span><span class="p">,</span> <span class="s">'constant'</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">SimpleImputer</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="n">s</span><span class="p">)))</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">()))</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'model'</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+  
+    <span class="n">cv</span> <span class="o">=</span> <span class="n">RepeatedStratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_repeats</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'accuracy'</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'&gt;%s %.3f (%.3f)'</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">scores</span><span class="p">)))</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">strategies</span><span class="p">,</span> <span class="n">showmeans</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;mean 0.818 (0.023)
+&gt;median 0.823 (0.028)
+&gt;most_frequent 0.832 (0.033)
+&gt;constant 0.840 (0.013)
+</code></pre></div></div>
+
+<p><img src="img-01-data_cleaning/img-01-data_cleaning/output_18_1.png" alt="png" /></p>
+
+<h4 id="knnimputer--regression--crossvalidation">KNNImputer + Regression + Crossvalidation</h4>
+
+<p>Each sample’s missing values are imputed using the mean value from <code class="language-plaintext highlighter-rouge">n_neighbors</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">strategies</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">]]</span>
+
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'imputer'</span><span class="p">,</span>  <span class="n">KNNImputer</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">))))</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">MinMaxScaler</span><span class="p">()))</span>
+    <span class="n">steps</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="s">'model'</span><span class="p">,</span> <span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="n">steps</span><span class="p">)</span>
+  
+    <span class="n">cv</span> <span class="o">=</span> <span class="n">RepeatedStratifiedKFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_repeats</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">pipeline</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'accuracy'</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'&gt; %s %.3f (%.3f)'</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">scores</span><span class="p">)))</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">strategies</span><span class="p">,</span> <span class="n">showmeans</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; 1 0.825 (0.028)
+&gt; 3 0.832 (0.029)
+&gt; 5 0.833 (0.027)
+&gt; 7 0.838 (0.030)
+</code></pre></div></div>
+
+<p><img src="img-01-data_cleaning/output_21_1.png" alt="png" /></p>
+
+<h2 id="2-outliers">2. Outliers</h2>
+
+<h3 id="21-manual-gaussian-data">2.1 Manual Gaussian Data</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">seed</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">randn</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span> <span class="o">+</span> <span class="mi">50</span> 
+
+<span class="n">mean</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'mean=%.3f stdv=%.3f'</span> <span class="o">%</span> <span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mean=50.194 stdv=4.905
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># define outliers
+</span><span class="n">cut_off</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="n">cut_off</span><span class="p">,</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">cut_off</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">lower</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Identified outliers: %d'</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Identified outliers: 4
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clean_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">lower</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Non-outlier observations: %d'</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">clean_data</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Non-outlier observations: 996
+</code></pre></div></div>
+
+<h3 id="22-manual-non-gaussian-data">2.2 Manual Non Gaussian Data</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># calculate interquartile range
+</span><span class="n">q25</span><span class="p">,</span> <span class="n">q75</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+<span class="n">iqr</span> <span class="o">=</span> <span class="n">q75</span> <span class="o">-</span> <span class="n">q25</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Percentile: 25th=%.3f, 75th=%.3f, IQR=%.3f'</span> <span class="o">%</span> <span class="p">(</span><span class="n">q25</span><span class="p">,</span> <span class="n">q75</span><span class="p">,</span> <span class="n">iqr</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Percentile: 25th=46.999, 75th=53.520, IQR=6.521
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># calculate the outlier cutoff
+</span><span class="n">cut_off</span> <span class="o">=</span> <span class="n">iqr</span> <span class="o">*</span> <span class="mf">1.5</span>
+<span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">q25</span> <span class="o">-</span> <span class="n">cut_off</span><span class="p">,</span> <span class="n">q75</span> <span class="o">+</span> <span class="n">cut_off</span>
+
+<span class="c1"># identify outliers
+</span><span class="n">outliers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">lower</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Identified outliers: %d'</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">outliers</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Identified outliers: 9
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># remove outliers
+</span><span class="n">clean_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">lower</span> <span class="ow">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">upper</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Non-outlier observations: %d'</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">clean_data</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Non-outlier observations: 991
+</code></pre></div></div>
+
+<h3 id="23-localoutlierfactor">2.3 LocalOutlierFactor</h3>
+
+<p>LocalOutlierFactor compares the density of each sample with the density of its nearest neighbors.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">LocalOutlierFactor</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">df_iris</span><span class="p">.</span><span class="n">values</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Raw observations:</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Raw observations:149
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lof</span> <span class="o">=</span> <span class="n">LocalOutlierFactor</span><span class="p">()</span>
+<span class="n">lof_result</span> <span class="o">=</span> <span class="n">lof</span><span class="p">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">lof_result</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Identified outliers: </span><span class="si">{</span><span class="n">np</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Identified outliers: 6
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_clean</span><span class="p">,</span> <span class="n">y_clean</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Non-outlier observations: %d'</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_clean</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Non-outlier observations: 143
+</code></pre></div></div>
+
+<h2 id="3-variance-threshold">3. Variance Threshold</h2>
+<p>Remove those variables with a low variance, meaning they have a low numbre of unique values.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">VarianceThreshold</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/data_cleaning.csv'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'Shape:</span><span class="si">{</span><span class="n">df</span><span class="p">.</span><span class="n">shape</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Shape:(937, 50)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+      <th>1</th>
+      <th>2</th>
+      <th>3</th>
+      <th>4</th>
+      <th>5</th>
+      <th>6</th>
+      <th>7</th>
+      <th>8</th>
+      <th>9</th>
+      <th>...</th>
+      <th>40</th>
+      <th>41</th>
+      <th>42</th>
+      <th>43</th>
+      <th>44</th>
+      <th>45</th>
+      <th>46</th>
+      <th>47</th>
+      <th>48</th>
+      <th>49</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>2558</td>
+      <td>1506.09</td>
+      <td>456.63</td>
+      <td>90</td>
+      <td>6395000.0</td>
+      <td>40.88</td>
+      <td>7.89</td>
+      <td>29780.0</td>
+      <td>0.19</td>
+      <td>...</td>
+      <td>2850.00</td>
+      <td>1000.00</td>
+      <td>763.16</td>
+      <td>135.46</td>
+      <td>3.73</td>
+      <td>0</td>
+      <td>33243.19</td>
+      <td>65.74</td>
+      <td>7.95</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2</td>
+      <td>22325</td>
+      <td>79.11</td>
+      <td>841.03</td>
+      <td>180</td>
+      <td>55812500.0</td>
+      <td>51.11</td>
+      <td>1.21</td>
+      <td>61900.0</td>
+      <td>0.02</td>
+      <td>...</td>
+      <td>5750.00</td>
+      <td>11500.00</td>
+      <td>9593.48</td>
+      <td>1648.80</td>
+      <td>0.60</td>
+      <td>0</td>
+      <td>51572.04</td>
+      <td>65.73</td>
+      <td>6.26</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3</td>
+      <td>115</td>
+      <td>1449.85</td>
+      <td>608.43</td>
+      <td>88</td>
+      <td>287500.0</td>
+      <td>40.42</td>
+      <td>7.34</td>
+      <td>3340.0</td>
+      <td>0.18</td>
+      <td>...</td>
+      <td>1400.00</td>
+      <td>250.00</td>
+      <td>150.00</td>
+      <td>45.13</td>
+      <td>9.33</td>
+      <td>1</td>
+      <td>31692.84</td>
+      <td>65.81</td>
+      <td>7.84</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4</td>
+      <td>1201</td>
+      <td>1562.53</td>
+      <td>295.65</td>
+      <td>66</td>
+      <td>3002500.0</td>
+      <td>42.40</td>
+      <td>7.97</td>
+      <td>18030.0</td>
+      <td>0.19</td>
+      <td>...</td>
+      <td>6041.52</td>
+      <td>761.58</td>
+      <td>453.21</td>
+      <td>144.97</td>
+      <td>13.33</td>
+      <td>1</td>
+      <td>37696.21</td>
+      <td>65.67</td>
+      <td>8.07</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5</td>
+      <td>312</td>
+      <td>950.27</td>
+      <td>440.86</td>
+      <td>37</td>
+      <td>780000.0</td>
+      <td>41.43</td>
+      <td>7.03</td>
+      <td>3350.0</td>
+      <td>0.17</td>
+      <td>...</td>
+      <td>1320.04</td>
+      <td>710.63</td>
+      <td>512.54</td>
+      <td>109.16</td>
+      <td>2.58</td>
+      <td>0</td>
+      <td>29038.17</td>
+      <td>65.66</td>
+      <td>7.35</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 50 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">thresholds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">thresholds</span><span class="p">:</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">VarianceThreshold</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">X_sel</span> <span class="o">=</span> <span class="n">transform</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="n">X_sel</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Threshold=%.2f, Features=%d'</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_features</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Threshold=0.00, Features=49
+Threshold=0.05, Features=37
+Threshold=0.10, Features=36
+Threshold=0.15, Features=35
+Threshold=0.20, Features=35
+Threshold=0.25, Features=35
+Threshold=0.30, Features=35
+Threshold=0.35, Features=35
+Threshold=0.40, Features=35
+Threshold=0.45, Features=33
+Threshold=0.50, Features=31
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="img-01-data_cleaning/output_43_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">kneed</span> <span class="kn">import</span> <span class="n">KneeLocator</span>
+
+<span class="n">kn</span> <span class="o">=</span> <span class="n">KneeLocator</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="s">'convex'</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s">'decreasing'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="s">'bx-'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">kn</span><span class="p">.</span><span class="n">knee</span><span class="p">,</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">linestyles</span><span class="o">=</span><span class="s">'dashed'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.LineCollection at 0x7fe98ca93e50&gt;
+</code></pre></div></div>
+
+<p><img src="img-01-data_cleaning/output_44_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>

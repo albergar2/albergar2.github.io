@@ -19,5 +19,13 @@ This collection of notebooks aims to recapitulate the most popular supervised ML
 1. [Market Basket Analysis](./projects/intro-uml/01-market_basket_analysis.html)
 1. [KNN](./projects/intro-uml/02-knn.html)
 
+
+### Data Science Material
+1. [Data Cleaning](./projects/ds-material/01-data_cleaning.html)
+1. [Feature Selection](./projects/ds-material/02-feature_selection.html)
+1. [Data Transformation](./projects/ds-material/03-data_transformation.html)
+1. [Dimensionality Reduction](./projects/ds-material/04-dimensionality_reduction.html)
+1. [Exploratory Data Analysis](./projects/ds-material/05-eda.html)
+
 <!-- [Show more](./projects.html) -->
 
