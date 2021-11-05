@@ -15,5 +15,9 @@ This collection of notebooks aims to recapitulate the most popular supervised ML
 1.  [Naive Bayes](./projects/intro-ml/06-naive_bayes.html): Naive Bayes Classification, Gaussian Naive Bayes
 
 
+### Gentle Introduction to Unsupervised Machine Learning
+1. [Market Basket Analysis](./projects/intro-uml/01-market_basket_analysis.html)
+1. [KNN](./projects/intro-uml/02-knn.html)
+
 <!-- [Show more](./projects.html) -->
 

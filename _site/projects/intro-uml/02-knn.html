@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <title>Alberto García | Data Scientist</title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Unsupervised Machine Learning: KNN | Alberto García Hernández</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Unsupervised Machine Learning: KNN" />
+<meta name="author" content="Alberto García Hernández" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Data Scientist" />
+<meta property="og:description" content="Data Scientist" />
+<link rel="canonical" href="http://localhost:4000/projects/intro-uml/02-knn.html" />
+<meta property="og:url" content="http://localhost:4000/projects/intro-uml/02-knn.html" />
+<meta property="og:site_name" content="Alberto García Hernández" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-01-01T00:00:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Unsupervised Machine Learning: KNN" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/projects/intro-uml/02-knn.html","headline":"Unsupervised Machine Learning: KNN","dateModified":"2021-01-01T00:00:00+01:00","datePublished":"2021-01-01T00:00:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/projects/intro-uml/02-knn.html"},"author":{"@type":"Person","name":"Alberto García Hernández"},"description":"Data Scientist","@type":"BlogPosting","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=8070621d74c168a42606ab654f266849f1fbb924">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      
+      <h1>Unsupervised Machine Learning: KNN</h1>
+      <p class="view">By Alberto García Hernández</p>
+      <p class="view">1 January 2021</p>
+      
+      <p><a href="../../">Back</a></p>
+<h4 id="download-notebook"><a href="https://github.com/albergar2/data_science_material/blob/master/ML/unsupervised/02-knn.ipynb">Download Notebook</a></h4>
+
+<p><strong>K-Nearest Neighbour</strong> algorithm is the simpliest ML algorithm. Also known as lazy learning (why? Because it does not create a generalized model during the time of training, so the testing phase is very important where it does the actual job.</p>
+
+<ul>
+  <li><strong>KNN classification</strong>: the output is a class membership. An object is classified by a plurality vote of its neighbors, with the object being assigned to the class most common among its k nearest neighbors.</li>
+  <li><strong>KNN regression</strong>: the output is the property value for the object. This value is the average of the values of k nearest neighbors.</li>
+</ul>
+
+<p>The distance measures for continious variables are:</p>
+
+<p><img src="attachment:8be90ad5-cd80-4545-812a-bfa7810cc383.png" alt="imagen.png" /></p>
+
+<p>In the instance of categorical variables, the Hamming distance must be used.</p>
+
+<p><img src="attachment:3354ba43-86db-4cbb-a144-a51bf87a93a4.png" alt="imagen.png" /></p>
+
+<p><strong>How to choose the value of K</strong>
+K value is a hyperparameter which needs to choose during the time of model building.</p>
+<ul>
+  <li>Low K: low bias, high variance.</li>
+  <li>High K: smoother decision boundary –&gt; low variance, high bias.</li>
+</ul>
+
+<p>We should choose an odd number if the number of classes is even. <strong>The most common values are to be 3 &amp; 5</strong>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_breast_cancer</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 id="1-knn-classifier">1. KNN Classifier</h2>
+
+<p>Tutorial: https://towardsdatascience.com/k-nearest-neighbor-python-2fccc47d2a55</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">breast_cancer</span> <span class="o">=</span> <span class="n">load_breast_cancer</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">breast_cancer</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">breast_cancer</span><span class="p">.</span><span class="n">feature_names</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[[</span><span class="s">'mean area'</span><span class="p">,</span> <span class="s">'mean compactness'</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Categorical</span><span class="p">.</span><span class="n">from_codes</span><span class="p">(</span><span class="n">breast_cancer</span><span class="p">.</span><span class="n">target</span><span class="p">,</span> <span class="n">breast_cancer</span><span class="p">.</span><span class="n">target_names</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mean area</th>
+      <th>mean compactness</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1001.0</td>
+      <td>0.27760</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1326.0</td>
+      <td>0.07864</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1203.0</td>
+      <td>0.15990</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>386.1</td>
+      <td>0.28390</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1297.0</td>
+      <td>0.13280</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>benign</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">'euclidean'</span><span class="p">)</span>
+<span class="n">knn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KNeighborsClassifier(metric='euclidean')
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y_pred</span> <span class="o">=</span> <span class="n">knn</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">X_test</span><span class="p">[</span><span class="s">'mean area'</span><span class="p">],</span>
+    <span class="n">X_test</span><span class="p">[</span><span class="s">'mean compactness'</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="n">y_pred</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s">'coolwarm'</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.PathCollection at 0x7fd4619beb80&gt;
+</code></pre></div></div>
+
+<p><img src="img-02-knn/output_13_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([[42, 13],
+       [ 9, 79]])
+</code></pre></div></div>
+
+<h2 id="2-knn-regression">2. KNN Regression</h2>
+
+<p>Tutorial: https://medium.com/analytics-vidhya/k-neighbors-regression-analysis-in-python-61532d56d8e4</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">mglearn</span> 
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mglearn</span><span class="p">.</span><span class="n">datasets</span><span class="p">.</span><span class="n">make_wave</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">reg</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s">'minkowski'</span><span class="p">)</span>
+<span class="n">reg</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KNeighborsRegressor(n_neighbors=3)
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.8344172446249605
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+      <footer>
+        
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+  </body>
+</html>
